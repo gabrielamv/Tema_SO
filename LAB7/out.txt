@@ -1,0 +1,5 @@
+Nr litere mari: 41
+Nr litere mici: 151
+Nr apariții: 12
+Dimensiune: 265
+Nr cifre: 35
