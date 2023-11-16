@@ -1,0 +1,10 @@
+Nume fisier: poza.bmp
+Inaltime: 0
+Latime: 0
+Dimensiune: 36578978
+Identificator utilizator: 501
+Timpul: 16.10.123 21:20
+Contor legaturi: 1
+Drepturi acces user: 
+Drepturi acces grupuri: 
+Drepturi acces pentru altii: 
