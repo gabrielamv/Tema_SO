@@ -52,21 +52,19 @@ char drepturi[4][4];
 
 void citireFisier(char *fisier)
 {
-    /*int fd=open(fisier, S_IRUSR);
+    int fd=open(fisier, S_IRUSR);
     if(fd==-1)
     {
-        perror("Eroare");
-    }
-    int nr;
-    char buff[BUFFSIZE];
-    while((nr=read(fd, buff, BUFFSIZE))) 
-    {   
-        //cum voi sari peste n bytes din fisier
-        lseek(fd, offset, );
+        perror("Fisierul nu a fost gasit! Mai cauta.\n");
+        exit(0);    }
+    
+    lseek(fd, 18, SEEK_SET);
+    read(fd, &latime, 4);
+    read(fd, &inaltime, 4);
 
-    }
+    
 
-    close(fd);*/
+    close(fd);
 }
 
 void citireInfFisier(char *fisier)
@@ -75,7 +73,7 @@ void citireInfFisier(char *fisier)
     int rez=stat(fisier,&inf);
     if(rez==-1)
     {
-        printf("ceva");
+        perror("Fisierul nu a fost gasit! Mai cauta.\n");
         exit(0);
     }
     identificator=inf.st_uid;
@@ -93,8 +91,44 @@ void citireInfFisier(char *fisier)
 
     //... ne jucam cu inf.st_mode
 
+    if(inf.st_mode&S_IRUSR)
+        drepturi[0][0]='R';
+    else
+        drepturi[0][0]='-';
+    if(inf.st_mode&S_IWUSR)
+        drepturi[0][1]='W';
+    else
+        drepturi[0][1]='-';
+    if(inf.st_mode&S_IXUSR)
+        drepturi[0][2]='E';
+    else
+        drepturi[0][2]='-';
 
-    
+    if(inf.st_mode&S_IRGRP)
+        drepturi[1][0]='R';
+    else
+        drepturi[1][0]='-';
+    if(inf.st_mode&S_IWGRP)
+        drepturi[1][1]='W';
+    else
+        drepturi[1][1]='-';
+    if(inf.st_mode&S_IXGRP)
+        drepturi[1][2]='E';
+    else
+        drepturi[1][2]='-';
+
+    if(inf.st_mode&S_IROTH)
+        drepturi[2][0]='R';
+    else
+        drepturi[2][0]='-';
+    if(inf.st_mode&S_IWOTH)
+        drepturi[2][1]='W';
+    else
+        drepturi[2][1]='-';
+    if(inf.st_mode&S_IXOTH)
+        drepturi[2][2]='E';
+    else
+        drepturi[2][2]='-';
 
 
 }
@@ -154,10 +188,13 @@ int main(int argc, char *argv[])
         printf("Usage: %s <fisier_intrare>\n", argv[0]);
         exit(0);
     }
-    if(strcoll(argv[1], ".bmp")==0)
-    {
+    int l=strlen(argv[1]);
+    if(l<5){
         printf("Usage: %s <fisier_intrare>\n", argv[0]);
         exit(0);
+    }else if(argv[1][l-1]!='p' || argv[1][l-2]!='m' || argv[1][l-3]!='b' | argv[1][l-4]!='.'){
+            printf("Usage: %s <fisier_intrare>\n", argv[0]);
+            exit(0);
     }
 
     citireFisier(argv[1]);
