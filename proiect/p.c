@@ -58,9 +58,9 @@ int citireInfoFisier(char *fisier)
         if(fisier[l-4]=='.' || fisier[l-3]=='b' || fisier[l-2]=='m' || fisier[l-1]=='p')
             tip=1; 
     }
-    //TODO simlink linux
-    //if(inf.st_mode | S_IFLNK)
-    //    tip = 2;
+
+    if(inf.st_mode | S_IFLNK)
+        tip = 2;
 
 
     identificator=inf.st_uid;
@@ -224,7 +224,10 @@ int main(int argc, char *argv[])
     }
     struct dirent *intrare;
     while((intrare = readdir(dir)) != NULL){
-        char *denumire=intrare->d_name;
+        char denumire[200];
+        strcpy(denumire, director);
+        strcat(denumire, "/");
+        strcat(denumire, intrare->d_name);
         int tip = citireInfoFisier(denumire);
         if(tip == 1){//fisier bmp
             citireBMP(denumire);
