@@ -43,6 +43,7 @@ Folosiți corect POSIX API, verificati codurile de retur și tratați scenariile
 
 #define BUFFSIZE 4096
 
+
 int inaltime,latime;
 int identificator;
 int dimensiune;
@@ -50,7 +51,7 @@ char data[100];
 int nrLegaturi;
 char drepturi[4][4];
 
-void citireFisier(char *fisier)
+void citireBMP(char *fisier)
 {
     int fd=open(fisier, S_IRUSR);
     if(fd==-1)
@@ -67,7 +68,7 @@ void citireFisier(char *fisier)
     close(fd);
 }
 
-void citireInfFisier(char *fisier)
+void citireInfo(char *fisier)
 {
     struct stat inf;
     int rez=stat(fisier,&inf);
@@ -79,8 +80,7 @@ void citireInfFisier(char *fisier)
     identificator=inf.st_uid;
     dimensiune=inf.st_size;
     nrLegaturi=inf.st_nlink;
-    struct timespec timp =inf.st_mtimespec;
-    time_t raw_time = timp.tv_sec;
+    time_t raw_time = inf.st_mtime;
     struct tm *timpCorect=localtime(&raw_time);
     sprintf(data, "%02d.%02d.%d %02d:%02d",
     timpCorect->tm_mday,
@@ -135,7 +135,7 @@ void citireInfFisier(char *fisier)
 
 void scriereStatistici(char *fisier)
 {
-    int fd=creat ("statistica.txt", S_IWUSR|S_IRUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+    int fd=open ("statistica.txt", O_WRONLY| O_APPEND);
     if(fd==-1)
     {
         perror("Eroare scriere statistici.");
@@ -173,6 +173,8 @@ void scriereStatistici(char *fisier)
     n=sprintf(buff, "Drepturi acces pentru altii: %s\n", drepturi[2]);
     write(fd, buff, n);
 
+    write(fd, "--------------------------------------------------\n", 51);
+
     close(fd);
 
     
@@ -196,9 +198,16 @@ int main(int argc, char *argv[])
             printf("Usage: %s <fisier_intrare>\n", argv[0]);
             exit(0);
     }
+    int fd=creat ("statistica.txt", S_IWUSR|S_IRUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+    if(fd==-1)
+    {
+        perror("Eroare creare fisier statistici.");
+    }
+    close(fd);
 
-    citireFisier(argv[1]);
-    citireInfFisier(argv[1]);
+
+    citireBMP(argv[1]);
+    citireInfo(argv[1]);
     scriereStatistici(argv[1]);
 
     return 0;
