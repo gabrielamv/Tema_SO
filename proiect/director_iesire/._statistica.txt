@@ -1,0 +1,6 @@
+Nume legatura: dir_test/.
+Dimensiune: 4096
+Dimensiune fisier: 4096
+Drepturi acces user: RWE
+Drepturi acces grupuri: RWE
+Drepturi acces pentru altii: R-E
