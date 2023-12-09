@@ -1,4 +1,4 @@
-Nume fisier: dir_test/a.txt
+Nume fisier: dir_test/legatura
 Dimensiune: 17
 Identificator utilizator: 1000
 Timpul: 02.11.123 23:04

@@ -1,6 +1,10 @@
-Nume legatura: dir_test/imagine_3.bmp
+Nume fisier: dir_test/imagine_3.bmp
+Inaltime: 256
+Latime: 256
 Dimensiune: 196666
-Dimensiune fisier: 196666
+Identificator utilizator: 1000
+Timpul: 09.11.123 15:53
+Contor legaturi: 1
 Drepturi acces user: RW-
 Drepturi acces grupuri: RW-
 Drepturi acces pentru altii: R--

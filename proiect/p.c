@@ -21,7 +21,7 @@
 int inaltime, latime;
 int identificator;
 int dimensiune, dimensiune_legatura;
-char data[100];
+char data[80];
 int nrLegaturi;
 char drepturi[4][4];
 
@@ -40,6 +40,54 @@ void citireBMP(char *fisier)
     read(fd, &inaltime, 4);
     close(fd);
 }
+void convertireBMP(char *fisier){
+    int fd = open(fisier, O_RDWR);
+    printf("Convertim imaginea %s\n", fisier);
+    if (fd == -1)
+    {
+        perror("Fisierul nu a fost gasit! Mai cauta.\n");
+        exit(0);
+    }
+    int offset;
+    int padding;
+    int bit_cnt;
+    lseek(fd, 10, SEEK_SET);
+    read(fd, &offset, 4);
+    lseek(fd, 28, SEEK_SET);
+    read(fd, &bit_cnt, 2);
+    //read(fd, &latime, 4);
+    //read(fd, &inaltime, 4);
+    padding=(32-(3*latime*bit_cnt)%32)%32;
+    padding=padding/8;
+
+    lseek(fd, offset, SEEK_SET);
+    int i,j;
+    for(i=0; i<inaltime; i++)
+    {
+        for(j=0; j<latime; j++)
+        {
+            
+            unsigned char p[(3*bit_cnt/8)+1];
+            read(fd, p, bit_cnt/8);
+            unsigned int r=p[0];
+            unsigned int g=p[1];
+            unsigned int b=p[2];
+            unsigned int gri= 0.299 * r + 0.587 * g + 0.114 * b;
+
+            lseek(fd, -(3*bit_cnt/8), SEEK_CUR);
+            memset(p, gri, (3*bit_cnt/8));
+            write(fd, p, 3*bit_cnt/8);
+            
+        }
+        lseek(fd, padding, SEEK_CUR);
+    }
+
+
+
+
+    close(fd);
+}
+
 
 /*Citeste informatiile despre un fisier*/
 int citireInfoFisier(char *fisier)
@@ -53,18 +101,21 @@ int citireInfoFisier(char *fisier)
     }
 
     int tip = -1;
-    if (inf.st_mode | S_IFDIR)
-        tip = 3;
-    if (inf.st_mode | S_IFREG)
+
+    if (S_ISREG(inf.st_mode))
     {
         tip = 0;
         int l = strlen(fisier);
-        if (fisier[l - 4] == '.' || fisier[l - 3] == 'b' || fisier[l - 2] == 'm' || fisier[l - 1] == 'p')
+        if (fisier[l - 4] == '.' && fisier[l - 3] == 'b' && fisier[l - 2] == 'm' && fisier[l - 1] == 'p')
             tip = 1;
+    }else
+    if (S_ISDIR(inf.st_mode)){
+        tip = 3;
+    }
+    if (S_ISLNK(inf.st_mode)){
+        tip = 2;
     }
 
-    if (inf.st_mode | S_IFLNK)
-        tip = 2;
 
     identificator = inf.st_uid;
     dimensiune = inf.st_size;
@@ -249,9 +300,25 @@ int main(int argc, char *argv[])
         strcat(denumire, "/");
         strcat(denumire, intrare->d_name);
         int tip = citireInfoFisier(denumire);
+        // printf("Fisier %s tip:%d\n", denumire, tip);
         if (tip == 1)
         { // fisier bmp
             citireBMP(denumire);
+            int pid;
+            if ((pid = fork()) < 0)
+            {
+                perror("Eroare");
+                exit(1);
+            }
+            if (pid == 0)
+            {//copil
+
+                
+                convertireBMP(denumire);
+                exit(0);
+            }
+            //parinte
+            nr_copii++;
         }
         int pid;
         if ((pid = fork()) < 0)
